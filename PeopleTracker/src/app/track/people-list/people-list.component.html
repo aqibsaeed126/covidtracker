@@ -1,0 +1,112 @@
+
+<div class="top">
+  <span class="col-md-10">Here you can Add/track person you met based on Name, Location, or Date.</span>
+  <span class="col-md-2"><button class="btn btn-outline-primary" (click)="open(content)">Add People</button></span>
+</div>
+
+<div class="row filters">
+  <div class="col-md-3 pr-5">
+    <div class="form-group">
+      <span class="font-weight-bold">Name:</span>
+      <input class="form-control ml-2" type="text" name="searchTerm" [(ngModel)]="service.searchTerm" />
+    </div>
+  </div>
+  <div class="col-md-7">
+    <span class="font-weight-bold">Date:</span>
+    <datepicker (onDateRangeChange)="onDateSelection($event)" [fromDate]="" [toDate]=""></datepicker>
+  </div>
+  <div class="col-md-2">
+    <span class="font-weight-bold">Last Days:</span>
+    <select class="custom-select" style="width: auto" (change)="onSelectChange($event)">
+      <option [ngValue]="0">None</option>
+      <option [ngValue]="14">Last 14 days</option>
+    </select>
+  </div>
+
+</div>
+ 
+
+<span class="ml-3" *ngIf="service.loading$ | async">Loading...</span>
+
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Age</th>
+      <th scope="col">Date</th>
+      <th scope="col">Location</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let person of persons$ | async">
+      <th scope="row">{{ person.id }}</th>
+      <td>
+        <ngb-highlight [result]="person.name" [term]="service.searchTerm"></ngb-highlight>
+      </td>
+      <td><ngb-highlight [result]="person.age | number" [term]="service.searchTerm"></ngb-highlight></td>
+      <td><ngb-highlight [result]="person.date | date" [term]="service.searchTerm"></ngb-highlight></td>
+      <td><ngb-highlight [result]="person.location" [term]="service.searchTerm"></ngb-highlight></td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div class="d-flex justify-content-between p-2">
+    <ngb-pagination
+      [collectionSize]="(total$ | async)!" [(page)]="service.page" [pageSize]="service.pageSize">
+    </ngb-pagination>
+
+    <select class="custom-select" style="width: auto" name="pageSize" [(ngModel)]="service.pageSize">
+      <option [ngValue]="2">2 items per page</option>
+      <option [ngValue]="4">4 items per page</option>
+      <option [ngValue]="6">6 items per page</option>
+    </select>
+  </div>
+
+  <ng-template #content let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Add People</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form>
+        <div class="form-group">
+          <label for="name">Name</label>
+          <div class="input-group">
+            <input #name type="text" id="name" class="form-control" placeholder="Name" name="name" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="age">Age</label>
+          <div class="input-group">
+            <input #age type="number" id="name" class="form-control" placeholder="Age" name="age"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="location">Location</label>
+          <div class="input-group">
+            <input #location type="textbox" id="location" class="form-control" placeholder="Location" name="location"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="dateOfBirth">Date you met</label>
+          <div class="input-group">
+            <input id="dateOfBirth" class="form-control" placeholder="yyyy-mm-dd" name="dp" ngbDatepicker #dp="ngbDatepicker">
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary calendar" (click)="dp.toggle()" type="button"></button>
+            </div>
+          </div>
+        </div>
+        <!-- Location Google Search Control Disabled due to invalid API Key -->
+        <!-- <div>
+          <input ngx-google-places-autocomplete [options]="options" #placesRef="ngx-places" (onAddressChange)="handleAddressChange($event)"/>
+        </div> -->
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-dark" (click)="save({name: name.value, age: age.value, location: location.value, date: dp._inputValue})">Save</button>
+    </div>
+  </ng-template>
+
